@@ -6,11 +6,13 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import in.shantanum.expensetrackerapi.entity.AuthModel;
 import in.shantanum.expensetrackerapi.entity.JwtResponse;
+import in.shantanum.expensetrackerapi.entity.PasswordDto;
 import in.shantanum.expensetrackerapi.entity.User;
 import in.shantanum.expensetrackerapi.entity.UserModel;
 import in.shantanum.expensetrackerapi.security.CustomUserDetailsService;
@@ -54,9 +57,7 @@ public class AuthController {
 		return new ResponseEntity<JwtResponse>(new JwtResponse(token), HttpStatus.OK);
 	}
 	
-	@PostMapping("/authenticate")
 	private void authenticate(String email, String password) throws Exception {
-		
 		try {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
 		} catch (DisabledException e) {
@@ -64,7 +65,6 @@ public class AuthController {
 		} catch (BadCredentialsException e) {
 			throw new Exception("Bad Credentials");
 		}
-		
 	}
 
 	@PostMapping("/register")
@@ -82,6 +82,17 @@ public class AuthController {
 	  public ResponseEntity<String> regenerateOtp(@RequestParam("email") String email, HttpServletRequest request) {
 	    return new ResponseEntity<>(userService.regenerateOtp(email, getAppUrl(request)), HttpStatus.OK);
 	  }
+	
+	@PostMapping("/forgot_password")
+	public ResponseEntity<String> processForgotPassword(HttpServletRequest request, @RequestParam("email") String userEmail) {
+		return new ResponseEntity<>(userService.generateForgotPasswordToken(userEmail, getAppUrl(request)), HttpStatus.OK);
+	}
+	
+	@PostMapping("/reset-password/token-validate")
+	public ResponseEntity<String> processResetPassword( @Valid PasswordDto passwordDto) {
+		return new ResponseEntity<>(userService.validatePasswordResetToken(passwordDto), HttpStatus.OK);
+	}
+
 	
 	public String getAppUrl(HttpServletRequest request) {
 		String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();

@@ -12,6 +12,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Component;
 
+import in.shantanum.expensetrackerapi.entity.User;
 import in.shantanum.expensetrackerapi.entity.UserModel;
 
 @Component
@@ -26,17 +27,29 @@ public class EmailUtil {
 	@Value("${aplication.baseuri}")
 	private String baseUri;
 
-	public void sendOtpEmail(String email, String otp, String contextPath) throws MessagingException {
+	public void sendOtpEmail(String email, String otp, String appUrl) throws MessagingException {
 	    MimeMessage mimeMessage = mailSender.createMimeMessage();
 	    MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
 	    mimeMessageHelper.setTo(email);
 	    mimeMessageHelper.setSubject("Verify OTP");
 	    mimeMessageHelper.setText("<div>"
-	          +"<a href=\""+contextPath+"/verify-account?email="+email+"&token="+otp+"\" target=\"_blank\">click link to verify</a>"
+	          +"<a href=\""+appUrl+"/verify-account?email="+email+"&token="+otp+"\" target=\"_blank\">click link to verify</a>"
 	        +"</div>", true);
 
 	    mailSender.send(mimeMessage);
 	  }
+
+	public void sendResetTokenEmail(String appUrl, String token, User user) throws MessagingException {
+	    MimeMessage mimeMessage = mailSender.createMimeMessage();
+	    MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
+	    mimeMessageHelper.setTo(user.getEmail());
+	    mimeMessageHelper.setSubject("Verify OTP");
+	    mimeMessageHelper.setText("<div>"
+	          +"<a href=\""+appUrl+"/verify-account?email="+user.getEmail()+"&token="+token+"\" target=\"_blank\">click link to verify</a>"
+	        +"</div>", true);
+
+	    mailSender.send(mimeMessage);
+	}
 	
 	/*
 	public void sendVeifyTokenEmail(String token, UserModel user) {
