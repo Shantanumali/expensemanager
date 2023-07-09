@@ -1,5 +1,6 @@
 package in.shantanum.expensetrackerapi.controller;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +11,11 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import in.shantanum.expensetrackerapi.entity.AuthModel;
@@ -50,6 +54,7 @@ public class AuthController {
 		return new ResponseEntity<JwtResponse>(new JwtResponse(token), HttpStatus.OK);
 	}
 	
+	@PostMapping("/authenticate")
 	private void authenticate(String email, String password) throws Exception {
 		
 		try {
@@ -63,8 +68,24 @@ public class AuthController {
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<User> save(@Valid @RequestBody UserModel user) {
-		return new ResponseEntity<User>(userService.createUser(user), HttpStatus.CREATED);
+	public ResponseEntity<User> save(@Valid @RequestBody UserModel user, HttpServletRequest request) {
+		return new ResponseEntity<User>(userService.createUser(user, getAppUrl(request)), HttpStatus.CREATED);
+	}
+	
+	@GetMapping("/verify-account")
+	  public ResponseEntity<String> verifyAccount(@RequestParam("email") String email,
+	      @RequestParam("token") String token) {
+	    return new ResponseEntity<>(userService.verifyAccount(email, token), HttpStatus.OK);
+	  }
+	
+	@PutMapping("/regenerate-otp")
+	  public ResponseEntity<String> regenerateOtp(@RequestParam("email") String email, HttpServletRequest request) {
+	    return new ResponseEntity<>(userService.regenerateOtp(email, getAppUrl(request)), HttpStatus.OK);
+	  }
+	
+	public String getAppUrl(HttpServletRequest request) {
+		String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+		return url;
 	}
 }
 

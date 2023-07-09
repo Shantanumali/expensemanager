@@ -5,7 +5,7 @@ import in.shantanum.expensetrackerapi.entity.UserModel;
 
 public interface UserService {
 	
-	User createUser(UserModel user);
+	User createUser(UserModel user, String string);
 	
 	User readUser();
 	
@@ -14,4 +14,8 @@ public interface UserService {
 	void deleteUser();
 	
 	User getLoggedInUser();
+
+	String regenerateOtp(String email, String string);
+
+	String verifyAccount(String email, String otp);	
 }
