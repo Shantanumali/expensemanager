@@ -46,7 +46,7 @@ public class AuthController {
 	
 	@PostMapping("/login")
 	public ResponseEntity<JwtResponse> login(@RequestBody AuthModel authModel) throws Exception {
-		
+		System.out.println(authModel);
 		authenticate(authModel.getEmail(), authModel.getPassword());
 		
 		//we need to generate the jwt token
@@ -83,13 +83,13 @@ public class AuthController {
 	    return new ResponseEntity<>(userService.regenerateOtp(email, getAppUrl(request)), HttpStatus.OK);
 	  }
 	
-	@PostMapping("/forgot_password")
-	public ResponseEntity<String> processForgotPassword(HttpServletRequest request, @RequestParam("email") String userEmail) {
-		return new ResponseEntity<>(userService.generateForgotPasswordToken(userEmail, getAppUrl(request)), HttpStatus.OK);
+	@PutMapping("/forgot-password")
+	public ResponseEntity<String> processForgotPassword(HttpServletRequest request, @RequestParam String email) {
+		return new ResponseEntity<>(userService.generateForgotPasswordToken(email, getAppUrl(request)), HttpStatus.OK);
 	}
 	
 	@PostMapping("/reset-password/token-validate")
-	public ResponseEntity<String> processResetPassword( @Valid PasswordDto passwordDto) {
+	public ResponseEntity<String> processResetPassword(@RequestBody @Valid PasswordDto passwordDto) {
 		return new ResponseEntity<>(userService.validatePasswordResetToken(passwordDto), HttpStatus.OK);
 	}
 

@@ -147,7 +147,10 @@ public class UserServiceImpl implements UserService {
 			throw new RuntimeException("Error while sending email");
 		} catch (UsernameNotFoundException ex) {
 			throw new RuntimeException(ex.getMessage());
-		} catch (Exception ex) {
+		}catch (RuntimeException ex) {
+			throw new RuntimeException(ex.getMessage());
+		}
+		catch (Exception ex) {
 			throw new RuntimeException("User acesss restricted!!!");
 		}
 		return "We have sent a reset password link to your email. Please check.";
@@ -162,28 +165,26 @@ public class UserServiceImpl implements UserService {
 	public String validatePasswordResetToken(PasswordDto passwordDto) {
 		User user = userRepository.findByEmail(passwordDto.getEmail().toLowerCase())
 				.orElseThrow(() -> new RuntimeException("User not found with this email: " + passwordDto.getEmail()));
-		
 		PasswordResetToken passToken = passwordTokenRepository.
-				findByUserAndToken(user, passwordDto.getResetasswordToken()).orElseThrow(
+				findByUserAndToken(user, passwordDto.getToken()).orElseThrow(
 						() -> new RuntimeException("Invalid User or token for: " + passwordDto.getEmail()));
-
 		if(isTokenExpired(passToken)){
 			throw new RuntimeException("Token expired, please regenerate token and try again!!!");
 		}
 		
 	        changeUserPassword(user, passwordDto.getNewPassword());
-	        deletePasswordResetTokenForUser(user, passwordDto.getResetasswordToken());
+	        deletePasswordResetTokenForUser(passToken.getId());
 	        return "Your password is changed successfully!!!";
 	}
 	
-	private void deletePasswordResetTokenForUser(User user, String resetasswordToken) {
-		passwordTokenRepository.deleteByUserAndToken(user, resetasswordToken);
+	private void deletePasswordResetTokenForUser(Long tokenid) {
+		passwordTokenRepository.deleteById(tokenid);
 	}
 
 	private void changeUserPassword(User user, String newPassword) {
 			User existingUser = userRepository.findByEmail(user.getEmail()).orElseThrow(
 					()-> new RuntimeException("User not found!!!"));
-			existingUser.setPassword(bcryptEncoder.encode(user.getPassword()));
+			existingUser.setPassword(bcryptEncoder.encode(newPassword));
 			userRepository.save(existingUser);
 	}
 

@@ -45,7 +45,7 @@ public class EmailUtil {
 	    mimeMessageHelper.setTo(user.getEmail());
 	    mimeMessageHelper.setSubject("Verify OTP");
 	    mimeMessageHelper.setText("<div>"
-	          +"<a href=\""+appUrl+"/verify-account?email="+user.getEmail()+"&token="+token+"\" target=\"_blank\">click link to verify</a>"
+	          +"Token (valid for 1 minute): "+token
 	        +"</div>", true);
 
 	    mailSender.send(mimeMessage);
