@@ -1,2 +1,2 @@
 From tomcat:8-jre8 
-COPY ./webapp.jar /usr/local/tomcat/webapps
+COPY ./expensemanager-1.0.0.jar /usr/local/tomcat/webapps
