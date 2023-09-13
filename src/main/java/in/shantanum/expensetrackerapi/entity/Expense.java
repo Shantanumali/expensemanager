@@ -24,6 +24,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,10 +35,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "tbl_expenses")
+@ApiModel(description = "This is a model for Expense!")
 public class Expense {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ApiModelProperty(notes = "Expense id")
 	private Long id;
 	
 	@Column(name = "expense_name")

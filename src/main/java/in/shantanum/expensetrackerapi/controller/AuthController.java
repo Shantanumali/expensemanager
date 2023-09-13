@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
@@ -57,7 +58,7 @@ public class AuthController {
 		return new ResponseEntity<JwtResponse>(new JwtResponse(token), HttpStatus.OK);
 	}
 	
-	private void authenticate(String email, String password) throws Exception {
+	public void authenticate(String email, String password) throws Exception {
 		try {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
 		} catch (DisabledException e) {
@@ -71,7 +72,7 @@ public class AuthController {
 	public ResponseEntity<User> save(@Valid @RequestBody UserModel user, HttpServletRequest request) {
 		return new ResponseEntity<User>(userService.createUser(user, getAppUrl(request)), HttpStatus.CREATED);
 	}
-	
+
 	@GetMapping("/verify-account")
 	  public ResponseEntity<String> verifyAccount(@RequestParam("email") String email,
 	      @RequestParam("token") String token) {
