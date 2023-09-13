@@ -1,2 +1,2 @@
 FROM maven:3.6.3-openjdk-11
-COPY ./webapp.war /usr/local/tomcat/webapps
+COPY ./target/expensemanager-1.0.0.jar /usr/local/tomcat/webapps
